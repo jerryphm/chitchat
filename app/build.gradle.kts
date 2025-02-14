@@ -5,6 +5,7 @@ plugins {
     alias(libs.plugins.ksp)
     alias(libs.plugins.hilt)
     alias(libs.plugins.firebase)
+    alias(libs.plugins.serialization)
 }
 
 android {
@@ -76,4 +77,8 @@ dependencies {
     implementation(libs.firebase.database)
     implementation(libs.firebase.storage)
     implementation(libs.firebase.messaging)
+
+    // navigation
+    implementation(libs.androidx.navigation.compose)
+    implementation(libs.serialization)
 }
