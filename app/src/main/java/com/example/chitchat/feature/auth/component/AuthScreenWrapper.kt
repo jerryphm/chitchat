@@ -47,7 +47,6 @@ fun AuthScreenWrapper(
     Scaffold(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color(0xFFF9F0EC))
             .clickable(
                 indication = null,
                 interactionSource = remember { MutableInteractionSource() }
