@@ -41,7 +41,10 @@ fun SignInScreen(modifier: Modifier = Modifier) {
             supportingText = if (isEmailError) emailSupportingText else null,
             modifier = Modifier
                 .onFocusChanged {
-                    if (isEmailEdited == false) {
+                    if (it.isFocused) {
+                        return@onFocusChanged
+                    }
+                    if (!isEmailEdited) {
                         return@onFocusChanged;
                     }
                     isEmailError = !"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$".toRegex().matches(email)
@@ -60,7 +63,10 @@ fun SignInScreen(modifier: Modifier = Modifier) {
             visualTransformation = PasswordVisualTransformation(),
             modifier = Modifier
                 .onFocusChanged {
-                    if (isPasswordEdited == false) {
+                    if (it.isFocused) {
+                        return@onFocusChanged
+                    }
+                    if (!isPasswordEdited) {
                         return@onFocusChanged
                     }
                     isPasswordError = password.length < 8
