@@ -1,117 +1,83 @@
 package com.example.chitchat.feature.auth.signup
 
 import androidx.compose.runtime.*
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.chitchat.feature.auth.component.AuthScreenWrapper
 import com.example.chitchat.feature.auth.component.AuthTextField
 
 @Composable
 fun SignUpScreen(
     onAlternativeMethodPress: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    viewModel: SignUpViewModel = hiltViewModel()
 ) {
-    var displayName by rememberSaveable { mutableStateOf("") }
-    var isDisplayNameError by rememberSaveable { mutableStateOf(false) }
-    var isDisplayNameEdited by rememberSaveable { mutableStateOf(false) }
-    var displayNameSupportingText by rememberSaveable { mutableStateOf("") }
+    val uiState by viewModel.uiState.collectAsState()
 
-    var email by rememberSaveable { mutableStateOf("") }
-    var isEmailError by rememberSaveable { mutableStateOf(false) }
-    var isEmailEdited by rememberSaveable { mutableStateOf(false) }
-    var emailSupportingText by rememberSaveable { mutableStateOf("") }
+    val displayName by viewModel::displayName
+    val isDisplayNameError by viewModel::isDisplayNameError
+    val isDisplayNameEdited by viewModel::isDisplayNameEdited
+    val displayNameSupportingText by viewModel::displayNameSupportingText
 
-    var password by rememberSaveable { mutableStateOf("") }
-    var isPasswordError by rememberSaveable { mutableStateOf(false) }
-    var isPasswordEdited by rememberSaveable { mutableStateOf(false) }
-    var passwordSupportingText by rememberSaveable { mutableStateOf("") }
+    val email by viewModel::email
+    val isEmailError by viewModel::isEmailError
+    val isEmailEdited by viewModel::isEmailEdited
+    val emailSupportingText by viewModel::emailSupportingText
 
-    var confirmedPassword by rememberSaveable { mutableStateOf("") }
-    var isConfirmedPasswordError by rememberSaveable { mutableStateOf(false) }
-    var isConfirmedPasswordEdited by rememberSaveable { mutableStateOf(false) }
-    var confirmedPasswordSupportingText by rememberSaveable { mutableStateOf("") }
+    val password by viewModel::password
+    val isPasswordError by viewModel::isPasswordError
+    val isPasswordEdited by viewModel::isPasswordEdited
+    val passwordSupportingText by viewModel::passwordSupportingText
 
-    fun validateDisplayName() {
-        isDisplayNameError = displayName.length < 3
-        displayNameSupportingText = if (displayName.isEmpty()) "This field is required" else "Display name must be at least 3 characters long"
-    }
-
-    fun validateEmail() {
-        isEmailError = !email.matches("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$".toRegex())
-        emailSupportingText = if (email.isEmpty()) "This field is required" else "Incorrect email format"
-    }
-
-    fun validatePassword() {
-        isPasswordError = password.length < 8 || password.length > 30 || !password.matches("^[a-zA-Z0-9]+$".toRegex())
-        passwordSupportingText = when {
-            password.isEmpty() -> "This field is required"
-            password.length > 30 -> "Password must not exceed 30 characters"
-            !password.matches("^[a-zA-Z0-9]+$".toRegex()) -> "Only letters and numbers allowed"
-            else -> "Password must be at least 8 characters long"
-        }
-    }
-
-    fun validateConfirmedPassword() {
-        isConfirmedPasswordError = confirmedPassword != password || confirmedPassword.isEmpty()
-        confirmedPasswordSupportingText = if (confirmedPassword.isEmpty()) "This field is required" else "Passwords do not match"
-    }
-
-    fun validateTextFields() {
-        validateDisplayName()
-        validateEmail()
-        validatePassword()
-        validateConfirmedPassword()
-    }
+    val confirmedPassword by viewModel::confirmedPassword
+    val isConfirmedPasswordError by viewModel::isConfirmedPasswordError
+    val isConfirmedPasswordEdited by viewModel::isConfirmedPasswordEdited
+    val confirmedPasswordSupportingText by viewModel::confirmedPasswordSupportingText
 
     AuthScreenWrapper(
         nextButtonTitle = "Sign Up",
         alternativeMethodTitle = "Already have an account? Sign In",
         onNextPress = {
-            validateTextFields()
+            viewModel.validateTextFields()
         },
         onAlternativeMethodPress = onAlternativeMethodPress
     ) {
-        // Display Name
         AuthTextField(
             value = displayName,
             onValueChange = {
-                displayName = it
-                isDisplayNameEdited = true
+                viewModel.displayName = it
+                viewModel.isDisplayNameEdited = true
             },
             isError = isDisplayNameError,
             supportingText = if (isDisplayNameError) displayNameSupportingText else null,
             label = "Display Name",
             modifier = Modifier.onFocusChanged {
                 if (it.isFocused) return@onFocusChanged
-                if (isDisplayNameEdited) validateDisplayName()
+                if (isDisplayNameEdited) viewModel.validateDisplayName()
             }
         )
-
-        // Email
         AuthTextField(
             value = email,
             onValueChange = {
-                email = it
-                isEmailEdited = true
+                viewModel.email = it
+                viewModel.isEmailEdited = true
             },
             isError = isEmailError,
             supportingText = if (isEmailError) emailSupportingText else null,
             label = "Email",
             modifier = Modifier.onFocusChanged {
                 if (it.isFocused) return@onFocusChanged
-                if (isEmailEdited) validateEmail()
+                if (isEmailEdited) viewModel.validateEmail()
             }
         )
-
-        // Password
         AuthTextField(
             value = password,
             onValueChange = {
-                password = it
-                isPasswordEdited = true
+                viewModel.password = it
+                viewModel.isPasswordEdited = true
             },
             isError = isPasswordError,
             supportingText = if (isPasswordError) passwordSupportingText else null,
@@ -119,16 +85,14 @@ fun SignUpScreen(
             visualTransformation = PasswordVisualTransformation(),
             modifier = Modifier.onFocusChanged {
                 if (it.isFocused) return@onFocusChanged
-                if (isPasswordEdited) validatePassword()
+                if (isPasswordEdited) viewModel.validatePassword()
             }
         )
-
-        // Confirm Password
         AuthTextField(
             value = confirmedPassword,
             onValueChange = {
-                confirmedPassword = it
-                isConfirmedPasswordEdited = true
+                viewModel.confirmedPassword = it
+                viewModel.isConfirmedPasswordEdited = true
             },
             isError = isConfirmedPasswordError,
             supportingText = if (isConfirmedPasswordError) confirmedPasswordSupportingText else null,
@@ -136,7 +100,7 @@ fun SignUpScreen(
             visualTransformation = PasswordVisualTransformation(),
             modifier = Modifier.onFocusChanged {
                 if (it.isFocused) return@onFocusChanged
-                if (isConfirmedPasswordEdited) validateConfirmedPassword()
+                if (isConfirmedPasswordEdited) viewModel.validateConfirmedPassword()
             }
         )
     }
