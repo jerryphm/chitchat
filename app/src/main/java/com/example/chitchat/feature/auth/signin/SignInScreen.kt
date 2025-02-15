@@ -13,7 +13,10 @@ import com.example.chitchat.feature.auth.component.AuthScreenWrapper
 import com.example.chitchat.feature.auth.component.AuthTextField
 
 @Composable
-fun SignInScreen(modifier: Modifier = Modifier) {
+fun SignInScreen(
+    onAlternativeMethodPress: () -> Unit,
+    modifier: Modifier = Modifier
+) {
     var email by rememberSaveable { mutableStateOf("") }
     var isEmailError by rememberSaveable { mutableStateOf(false) }
     var isEmailEdited by rememberSaveable { mutableStateOf(false) }
@@ -24,11 +27,28 @@ fun SignInScreen(modifier: Modifier = Modifier) {
     var isPasswordEdited by rememberSaveable { mutableStateOf(false) }
     var passwordSupportingText by rememberSaveable { mutableStateOf("") }
 
+    fun validateEmail() {
+        isEmailError = !"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$".toRegex().matches(email)
+        emailSupportingText = if (email.isNotEmpty()) "Incorrect email format" else "This field is required"
+    }
+
+    fun validatePassword() {
+        isPasswordError = password.length < 8
+        passwordSupportingText = if (password.isEmpty()) "This field is required" else "Password must be at least 8 characters long"
+    }
+
+    fun validateTextFields() {
+        validateEmail()
+        validatePassword()
+    }
+
     AuthScreenWrapper(
         nextButtonTitle = "Sign In",
         alternativeMethodTitle = "New to ChitChat? Sign Up",
-        onNextPress = {},
-        onAlternativeMethodPress = {}
+        onNextPress = {
+            validateTextFields()
+        },
+        onAlternativeMethodPress = onAlternativeMethodPress
     ) {
         AuthTextField(
             value = email,
@@ -41,14 +61,8 @@ fun SignInScreen(modifier: Modifier = Modifier) {
             supportingText = if (isEmailError) emailSupportingText else null,
             modifier = Modifier
                 .onFocusChanged {
-                    if (it.isFocused) {
-                        return@onFocusChanged
-                    }
-                    if (!isEmailEdited) {
-                        return@onFocusChanged;
-                    }
-                    isEmailError = !"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$".toRegex().matches(email)
-                    emailSupportingText = if (email.isNotEmpty()) "Incorrect email format" else "This field is required"
+                    if (it.isFocused) return@onFocusChanged
+                    if (isEmailEdited) validateEmail()
                 }
         )
         AuthTextField(
@@ -63,14 +77,8 @@ fun SignInScreen(modifier: Modifier = Modifier) {
             visualTransformation = PasswordVisualTransformation(),
             modifier = Modifier
                 .onFocusChanged {
-                    if (it.isFocused) {
-                        return@onFocusChanged
-                    }
-                    if (!isPasswordEdited) {
-                        return@onFocusChanged
-                    }
-                    isPasswordError = password.length < 8
-                    passwordSupportingText = "Password must be at least 8 characters long"
+                    if (it.isFocused) return@onFocusChanged
+                    if (isPasswordEdited) validatePassword()
                 }
         )
     }
@@ -79,5 +87,5 @@ fun SignInScreen(modifier: Modifier = Modifier) {
 @Preview
 @Composable
 fun SignInScreenPreview() {
-    SignInScreen()
+    SignInScreen({})
 }

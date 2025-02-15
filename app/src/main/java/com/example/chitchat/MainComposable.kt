@@ -13,18 +13,24 @@ import com.example.chitchat.feature.auth.signup.SignUpScreen
 
 @Composable
 fun MainComposable(modifier: Modifier = Modifier) {
+    val navController = rememberNavController()
+
     Surface(
         modifier = modifier.fillMaxSize()
     ) {
         NavHost(
-            navController = rememberNavController(),
+            navController = navController,
             startDestination = "signIn"
         ) {
             composable("signIn") {
-                SignInScreen()
+                SignInScreen(
+                    onAlternativeMethodPress = { navController.navigate("signUp") }
+                )
             }
             composable("signUp") {
-                SignUpScreen()
+                SignUpScreen(
+                    onAlternativeMethodPress = { navController.navigate("signIn") }
+                )
             }
         }
     }
