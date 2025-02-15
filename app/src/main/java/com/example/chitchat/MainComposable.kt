@@ -10,6 +10,13 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.chitchat.feature.auth.signin.SignInScreen
 import com.example.chitchat.feature.auth.signup.SignUpScreen
+import com.example.chitchat.feature.home.HomeScreen
+
+enum class ChitChatScreens {
+    SIGN_IN,
+    SIGN_UP,
+    HOME,
+}
 
 @Composable
 fun MainComposable(modifier: Modifier = Modifier) {
@@ -20,17 +27,20 @@ fun MainComposable(modifier: Modifier = Modifier) {
     ) {
         NavHost(
             navController = navController,
-            startDestination = "signIn"
+            startDestination = ChitChatScreens.SIGN_IN.name
         ) {
-            composable("signIn") {
+            composable(ChitChatScreens.SIGN_IN.name) {
                 SignInScreen(
-                    onAlternativeMethodPress = { navController.navigate("signUp") }
+                    onAlternativeMethodPress = { navController.navigate(ChitChatScreens.SIGN_UP.name) }
                 )
             }
-            composable("signUp") {
+            composable(ChitChatScreens.SIGN_UP.name) {
                 SignUpScreen(
-                    onAlternativeMethodPress = { navController.navigate("signIn") }
+                    onAlternativeMethodPress = { navController.navigate(ChitChatScreens.SIGN_IN.name) }
                 )
+            }
+            composable(ChitChatScreens.HOME.name) {
+                HomeScreen()
             }
         }
     }
