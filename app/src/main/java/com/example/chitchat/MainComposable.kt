@@ -36,7 +36,7 @@ fun MainComposable(modifier: Modifier = Modifier) {
             }
             composable(ChitChatScreens.SIGN_UP.name) {
                 SignUpScreen(
-                    onAlternativeMethodPress = { navController.navigate(ChitChatScreens.SIGN_IN.name) }
+                    onAlternativeMethodPress = { navController.popBackStack(ChitChatScreens.SIGN_IN.name, false) }
                 )
             }
             composable(ChitChatScreens.HOME.name) {
