@@ -3,25 +3,12 @@ package com.example.chitchat.feature.auth.signup
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-
 import androidx.lifecycle.ViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
 import javax.inject.Inject
-
-sealed interface SignUpState {
-    data object Idle: SignUpState
-    data object Loading: SignUpState
-    data object Success: SignUpState
-    data object Error: SignUpState
-}
 
 @HiltViewModel
 class SignUpViewModel @Inject constructor() : ViewModel() {
-    private val _uiState: MutableStateFlow<SignUpState> = MutableStateFlow(SignUpState.Idle)
-    val uiState = _uiState.asStateFlow()
-
     var displayName by  mutableStateOf("")
     var isDisplayNameError by  mutableStateOf(false)
     var isDisplayNameEdited by  mutableStateOf(false)
@@ -67,10 +54,11 @@ class SignUpViewModel @Inject constructor() : ViewModel() {
         confirmedPasswordSupportingText = if (confirmedPassword.isEmpty()) "This field is required" else "Passwords do not match"
     }
 
-    fun validateTextFields() {
+    fun validateTextFields(): Boolean {
         validateDisplayName()
         validateEmail()
         validatePassword()
         validateConfirmedPassword()
+        return !isDisplayNameError && !isEmailError && !isPasswordError && !isConfirmedPasswordError
     }
 }

@@ -1,5 +1,7 @@
 package com.example.chitchat.feature.auth.signin
 
+import android.widget.Toast
+import androidx.activity.compose.LocalActivity
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -8,10 +10,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.chitchat.MainActivity
 import com.example.chitchat.feature.auth.component.AuthScreenWrapper
 import com.example.chitchat.feature.auth.component.AuthTextField
 
@@ -22,8 +26,6 @@ fun SignInScreen(
     modifier: Modifier = Modifier,
     viewModel: SignInViewModel = hiltViewModel()
 ) {
-    val uiState by viewModel.uiState.collectAsState()
-
     val email by viewModel::email
     val isEmailError by viewModel::isEmailError
     val isEmailEdited by viewModel::isEmailEdited
@@ -37,11 +39,23 @@ fun SignInScreen(
     val focusRequester1 = remember { FocusRequester() }
     val focusRequester2 = remember { FocusRequester() }
 
+    val activity = LocalActivity.current as MainActivity
+    val context = LocalContext.current
+    val auth = activity.auth
+
     AuthScreenWrapper(
         nextButtonTitle = "Sign In",
         alternativeMethodTitle = "New to ChitChat? Sign Up",
         onNextPress = {
-            viewModel.validateTextFields()
+            val isAllGood = viewModel.validateTextFields()
+            if (isAllGood) {
+                auth.signInWithEmailAndPassword(email, password)
+                    .addOnCompleteListener(activity) { task ->
+                        val msg = if (task.isSuccessful) "Sign in success." else "Email or password is incorrect."
+                        Toast.makeText(context, msg, Toast.LENGTH_SHORT).show()
+                    }
+
+            }
         },
         onAlternativeMethodPress = onAlternativeMethodPress
     ) {

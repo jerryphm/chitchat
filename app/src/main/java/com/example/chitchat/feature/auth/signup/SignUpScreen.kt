@@ -1,12 +1,17 @@
 package com.example.chitchat.feature.auth.signup
 
+import android.util.Log
+import android.widget.Toast
+import androidx.activity.compose.LocalActivity
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.chitchat.MainActivity
 import com.example.chitchat.feature.auth.component.AuthScreenWrapper
 import com.example.chitchat.feature.auth.component.AuthTextField
 
@@ -16,8 +21,6 @@ fun SignUpScreen(
     modifier: Modifier = Modifier,
     viewModel: SignUpViewModel = hiltViewModel()
 ) {
-    val uiState by viewModel.uiState.collectAsState()
-
     val displayName by viewModel::displayName
     val isDisplayNameError by viewModel::isDisplayNameError
     val isDisplayNameEdited by viewModel::isDisplayNameEdited
@@ -43,11 +46,22 @@ fun SignUpScreen(
     val focusRequester3 = remember { FocusRequester() }
     val focusRequester4 = remember { FocusRequester() }
 
+    val activity = LocalActivity.current as MainActivity
+    val auth = activity.auth
+    val context = LocalContext.current
+
     AuthScreenWrapper(
         nextButtonTitle = "Sign Up",
         alternativeMethodTitle = "Already have an account? Sign In",
         onNextPress = {
-            viewModel.validateTextFields()
+            val isAllGood = viewModel.validateTextFields()
+            if (isAllGood) {
+                auth.createUserWithEmailAndPassword(email, password)
+                    .addOnCompleteListener(activity) { task ->
+                        val msg = if (task.isSuccessful) "Sign up success." else "Sign up failed."
+                        Toast.makeText(context, msg, Toast.LENGTH_SHORT).show()
+                    }
+            }
         },
         onAlternativeMethodPress = onAlternativeMethodPress
     ) {
