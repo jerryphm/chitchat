@@ -3,8 +3,12 @@ package com.example.chitchat.feature.auth.signin
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -30,6 +34,9 @@ fun SignInScreen(
     val isPasswordEdited by viewModel::isPasswordEdited
     val passwordSupportingText by viewModel::passwordSupportingText
 
+    val focusRequester1 = remember { FocusRequester() }
+    val focusRequester2 = remember { FocusRequester() }
+
     AuthScreenWrapper(
         nextButtonTitle = "Sign In",
         alternativeMethodTitle = "New to ChitChat? Sign Up",
@@ -47,11 +54,13 @@ fun SignInScreen(
             label = "Email",
             isError = isEmailError,
             supportingText = if (isEmailError) emailSupportingText else null,
+            focusRequester = focusRequester1,
+            nextFocusRequester = focusRequester2,
             modifier = Modifier
                 .onFocusChanged {
                     if (it.isFocused) return@onFocusChanged
                     if (isEmailEdited) viewModel.validateEmail()
-                }
+                },
         )
         AuthTextField(
             value = password,
@@ -63,6 +72,8 @@ fun SignInScreen(
             label = "ChitChat Password",
             supportingText = if (isPasswordError) passwordSupportingText else null,
             visualTransformation = PasswordVisualTransformation(),
+            focusRequester = focusRequester2,
+            isTheLastField = true,
             modifier = Modifier
                 .onFocusChanged {
                     if (it.isFocused) return@onFocusChanged

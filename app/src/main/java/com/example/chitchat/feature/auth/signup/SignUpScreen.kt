@@ -2,6 +2,7 @@ package com.example.chitchat.feature.auth.signup
 
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
@@ -37,6 +38,11 @@ fun SignUpScreen(
     val isConfirmedPasswordEdited by viewModel::isConfirmedPasswordEdited
     val confirmedPasswordSupportingText by viewModel::confirmedPasswordSupportingText
 
+    val focusRequester1 = remember { FocusRequester() }
+    val focusRequester2 = remember { FocusRequester() }
+    val focusRequester3 = remember { FocusRequester() }
+    val focusRequester4 = remember { FocusRequester() }
+
     AuthScreenWrapper(
         nextButtonTitle = "Sign Up",
         alternativeMethodTitle = "Already have an account? Sign In",
@@ -54,6 +60,8 @@ fun SignUpScreen(
             isError = isDisplayNameError,
             supportingText = if (isDisplayNameError) displayNameSupportingText else null,
             label = "Display Name",
+            focusRequester = focusRequester1,
+            nextFocusRequester = focusRequester2,
             modifier = Modifier.onFocusChanged {
                 if (it.isFocused) return@onFocusChanged
                 if (isDisplayNameEdited) viewModel.validateDisplayName()
@@ -68,6 +76,8 @@ fun SignUpScreen(
             isError = isEmailError,
             supportingText = if (isEmailError) emailSupportingText else null,
             label = "Email",
+            focusRequester = focusRequester2,
+            nextFocusRequester = focusRequester3,
             modifier = Modifier.onFocusChanged {
                 if (it.isFocused) return@onFocusChanged
                 if (isEmailEdited) viewModel.validateEmail()
@@ -83,6 +93,8 @@ fun SignUpScreen(
             supportingText = if (isPasswordError) passwordSupportingText else null,
             label = "ChitChat Password",
             visualTransformation = PasswordVisualTransformation(),
+            focusRequester = focusRequester3,
+            nextFocusRequester = focusRequester4,
             modifier = Modifier.onFocusChanged {
                 if (it.isFocused) return@onFocusChanged
                 if (isPasswordEdited) viewModel.validatePassword()
@@ -98,6 +110,8 @@ fun SignUpScreen(
             supportingText = if (isConfirmedPasswordError) confirmedPasswordSupportingText else null,
             label = "Confirmed ChitChat Password",
             visualTransformation = PasswordVisualTransformation(),
+            focusRequester = focusRequester4,
+            isTheLastField = true,
             modifier = Modifier.onFocusChanged {
                 if (it.isFocused) return@onFocusChanged
                 if (isConfirmedPasswordEdited) viewModel.validateConfirmedPassword()
