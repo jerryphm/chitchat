@@ -14,11 +14,14 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import com.example.chitchat.feature.auth.signin.SignInScreen
 import com.example.chitchat.feature.auth.signup.SignUpScreen
+import com.example.chitchat.feature.chat.ChatScreen
 import com.example.chitchat.feature.home.HomeScreen
 import com.example.chitchat.ui.theme.ChitChatTheme
 import com.google.firebase.Firebase
@@ -30,6 +33,7 @@ enum class ChitChatScreens {
     SIGN_IN,
     SIGN_UP,
     HOME,
+    CHAT,
 }
 
 @AndroidEntryPoint
@@ -97,7 +101,19 @@ fun App(
                 )
             }
             composable(ChitChatScreens.HOME.name) {
-                HomeScreen()
+                HomeScreen(
+                    onChannelPress = {
+                        navController.navigate("${ChitChatScreens.CHAT}/${it}")
+                    }
+                )
+            }
+            composable("${ChitChatScreens.CHAT.name}/{channelId}", arguments = listOf(
+                navArgument("channelId") {
+                    type = NavType.StringType
+                }
+            )) {
+                val channelId = it.arguments?.getString("channelId") ?: ""
+                ChatScreen(channelId)
             }
         }
     }
